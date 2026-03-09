@@ -1,0 +1,945 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Explorer — Think Like a Mathematician!</title>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box
+        }
+
+        :root {
+            --bg: #f0f4ff;
+            --card: #fff;
+            --text: #1e293b;
+            --text-m: #64748b;
+            --green: #22c55e;
+            --green-bg: #dcfce7;
+            --red: #ef4444;
+            --red-bg: #fee2e2;
+            --blue: #3b82f6;
+            --blue-bg: #dbeafe;
+            --purple: #8b5cf6;
+            --purple-bg: #ede9fe;
+            --orange: #f59e0b;
+            --orange-bg: #fef3c7;
+            --pink: #ec4899;
+            --radius: 20px;
+            --shadow: 0 4px 24px rgba(0, 0, 0, 0.08)
+        }
+
+        body {
+            font-family: 'Nunito', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh
+        }
+
+        .screen {
+            display: none
+        }
+
+        .screen.active {
+            display: flex
+        }
+
+        #welcome {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 32px;
+            text-align: center;
+            background: linear-gradient(135deg, #dbeafe 0%, #ede9fe 50%, #fce7f3 100%)
+        }
+
+        .welcome-emoji {
+            font-size: 80px;
+            margin-bottom: 16px;
+            animation: bounce 2s infinite
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-16px)
+            }
+        }
+
+        .welcome-title {
+            font-size: 42px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--blue), var(--purple), var(--pink));
+            -webkit-background-clip: text;
+            background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px
+        }
+
+        .welcome-sub {
+            font-size: 20px;
+            color: var(--text-m);
+            margin-bottom: 40px;
+            font-weight: 600
+        }
+
+        .cat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            max-width: 500px;
+            margin-bottom: 32px;
+            width: 100%
+        }
+
+        .cat-btn {
+            padding: 20px;
+            border: 3px solid #e2e8f0;
+            border-radius: 16px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px
+        }
+
+        .cat-btn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, .12)
+        }
+
+        .cat-btn .emoji {
+            font-size: 36px
+        }
+
+        .cat-btn.c1 {
+            border-color: var(--green);
+            background: var(--green-bg);
+            color: #15803d
+        }
+
+        .cat-btn.c2 {
+            border-color: var(--blue);
+            background: var(--blue-bg);
+            color: #1d4ed8
+        }
+
+        .cat-btn.c3 {
+            border-color: var(--purple);
+            background: var(--purple-bg);
+            color: #6d28d9
+        }
+
+        .cat-btn.c4 {
+            border-color: var(--orange);
+            background: var(--orange-bg);
+            color: #92400e
+        }
+
+        .cat-btn.c5 {
+            border-color: var(--pink);
+            background: #fce7f3;
+            color: #be185d
+        }
+
+        #game {
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 24px;
+            background: var(--bg)
+        }
+
+        .game-header {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px
+        }
+
+        .back-btn {
+            padding: 10px 16px;
+            border: none;
+            border-radius: 12px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            color: var(--text-m);
+            box-shadow: var(--shadow)
+        }
+
+        .score-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: #fff;
+            padding: 10px 20px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 800;
+            box-shadow: var(--shadow)
+        }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 640px;
+            height: 8px;
+            background: #e2e8f0;
+            border-radius: 8px;
+            margin-bottom: 24px;
+            overflow: hidden
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--purple));
+            border-radius: 8px;
+            transition: width .4s
+        }
+
+        .problem-card {
+            width: 100%;
+            max-width: 640px;
+            background: #fff;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 32px;
+            margin-bottom: 20px;
+            border: 3px solid #e2e8f0;
+            position: relative
+        }
+
+        .problem-category {
+            display: inline-block;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 16px
+        }
+
+        .problem-number {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-m);
+            margin-bottom: 8px
+        }
+
+        .problem-text {
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.5;
+            margin-bottom: 8px
+        }
+
+        .problem-visual {
+            font-size: 28px;
+            margin: 16px 0;
+            letter-spacing: 2px;
+            text-align: center;
+            white-space: pre-line
+        }
+
+        .speak-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: none;
+            background: var(--blue-bg);
+            font-size: 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all .2s
+        }
+
+        .speak-btn:hover {
+            background: var(--blue);
+            color: white
+        }
+
+        .choices {
+            width: 100%;
+            max-width: 640px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px
+        }
+
+        .choice-btn {
+            padding: 18px 16px;
+            border: 3px solid #e2e8f0;
+            border-radius: 14px;
+            background: #fff;
+            font-family: inherit;
+            font-size: 20px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .15s;
+            display: flex;
+            align-items: center;
+            gap: 12px
+        }
+
+        .choice-btn:hover {
+            border-color: var(--blue);
+            background: var(--blue-bg)
+        }
+
+        .choice-btn:active {
+            transform: scale(.97)
+        }
+
+        .choice-btn.selected {
+            border-color: var(--blue);
+            background: var(--blue-bg);
+            color: #1d4ed8
+        }
+
+        .choice-btn.correct {
+            border-color: var(--green);
+            background: var(--green-bg);
+            color: #15803d
+        }
+
+        .choice-btn.wrong {
+            border-color: var(--red);
+            background: var(--red-bg);
+            color: #b91c1c
+        }
+
+        .choice-letter {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 800;
+            flex-shrink: 0
+        }
+
+        .actions {
+            width: 100%;
+            max-width: 640px;
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px
+        }
+
+        .act-btn {
+            flex: 1;
+            padding: 16px;
+            border: none;
+            border-radius: 14px;
+            font-family: inherit;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: all .2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px
+        }
+
+        .act-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, .12)
+        }
+
+        .btn-hint {
+            background: var(--orange);
+            color: #fff
+        }
+
+        .btn-check {
+            background: var(--green);
+            color: #fff
+        }
+
+        .btn-next {
+            background: var(--purple);
+            color: #fff
+        }
+
+        .hint-box {
+            width: 100%;
+            max-width: 640px;
+            background: var(--orange-bg);
+            border: 2px solid var(--orange);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: none
+        }
+
+        .hint-box.visible {
+            display: block
+        }
+
+        .hint-label {
+            font-size: 14px;
+            font-weight: 800;
+            color: #92400e;
+            margin-bottom: 8px
+        }
+
+        .hint-text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #78350f;
+            line-height: 1.6
+        }
+
+        .hint-concept {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 8px;
+            background: #fff;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--purple);
+            margin-top: 8px
+        }
+
+        .explanation-box {
+            width: 100%;
+            max-width: 640px;
+            background: #ecfdf5;
+            border: 2px solid var(--green);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 16px;
+            display: none
+        }
+
+        .explanation-box.visible {
+            display: block
+        }
+
+        .explanation-box .label {
+            font-size: 14px;
+            font-weight: 800;
+            color: #15803d;
+            margin-bottom: 8px
+        }
+
+        .explanation-box .text {
+            font-size: 16px;
+            font-weight: 600;
+            color: #166534;
+            line-height: 1.6
+        }
+
+        .strategy-section {
+            width: 100%;
+            max-width: 640px;
+            display: none;
+            margin-bottom: 20px
+        }
+
+        .strategy-section.visible {
+            display: block
+        }
+
+        .strategy-title {
+            font-size: 16px;
+            font-weight: 800;
+            color: var(--purple);
+            text-align: center;
+            margin-bottom: 12px
+        }
+
+        .strategy-card {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 16px;
+            margin-bottom: 10px;
+            cursor: pointer;
+            transition: all .2s
+        }
+
+        .strategy-card:hover {
+            border-color: var(--purple)
+        }
+
+        .strategy-card.open {
+            border-color: var(--purple);
+            background: var(--purple-bg)
+        }
+
+        .strategy-card .name {
+            font-size: 15px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px
+        }
+
+        .strategy-card .detail {
+            display: none;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-m);
+            margin-top: 8px;
+            line-height: 1.6
+        }
+
+        .strategy-card.open .detail {
+            display: block
+        }
+
+        .confetti-box {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 999
+        }
+
+        .confetti {
+            position: absolute;
+            width: 10px;
+            height: 10px;
+            border-radius: 2px;
+            animation: fall 2s ease-in forwards
+        }
+
+        @keyframes fall {
+            0% {
+                transform: translateY(-20px) rotate(0);
+                opacity: 1
+            }
+
+            100% {
+                transform: translateY(100vh) rotate(720deg);
+                opacity: 0
+            }
+        }
+
+        @media(max-width:600px) {
+            .welcome-title {
+                font-size: 32px
+            }
+
+            .cat-grid {
+                grid-template-columns: 1fr
+            }
+
+            .problem-text {
+                font-size: 18px
+            }
+
+            .choices {
+                grid-template-columns: 1fr
+            }
+
+            .choice-btn {
+                font-size: 18px
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="welcome" class="screen active">
+        <div class="welcome-emoji">🧠</div>
+        <h1 class="welcome-title">Math Explorer</h1>
+        <p class="welcome-sub">Think like a mathematician! 🚀</p>
+        <div class="cat-grid">
+            <button class="cat-btn c1" onclick="startGame('counting')"><span class="emoji">🐾</span>Counting &amp;
+                Groups</button>
+            <button class="cat-btn c2" onclick="startGame('compare')"><span class="emoji">⚖️</span>Compare &amp;
+                Difference</button>
+            <button class="cat-btn c3" onclick="startGame('missing')"><span class="emoji">❓</span>Missing
+                Numbers</button>
+            <button class="cat-btn c4" onclick="startGame('pattern')"><span class="emoji">🔢</span>Patterns</button>
+            <button class="cat-btn c5" onclick="startGame('word')"><span class="emoji">📖</span>Word Problems</button>
+            <button class="cat-btn" style="border-color:var(--blue);background:var(--blue-bg);color:#1d4ed8"
+                onclick="startGame('all')"><span class="emoji">🔀</span>Mix It Up!</button>
+        </div>
+    </div>
+
+    <div id="game" class="screen">
+        <div class="game-header">
+            <button class="back-btn" onclick="goHome()">← Home</button>
+            <div class="score-box">⭐ <span id="score">0</span> / <span id="total">0</span></div>
+            <div class="score-box" style="background:var(--orange-bg);color:#92400e">🔥 <span id="streak">0</span></div>
+        </div>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill" style="width:0%"></div>
+        </div>
+        <div class="problem-card">
+            <button class="speak-btn" onclick="speakProblem()" title="Read aloud">🔊</button>
+            <div class="problem-number" id="probNum">Question 1 of 10</div>
+            <div class="problem-category" id="probCat" style="background:var(--green-bg);color:#15803d">🐾 Counting
+            </div>
+            <div class="problem-text" id="probText"></div>
+            <div class="problem-visual" id="probVisual"></div>
+        </div>
+        <div class="choices" id="choices"></div>
+        <div class="hint-box" id="hintBox">
+            <div class="hint-label" id="hintLabel">💡 Hint 1</div>
+            <div class="hint-text" id="hintText"></div>
+        </div>
+        <div class="explanation-box" id="explBox">
+            <div class="label">✅ How to solve it:</div>
+            <div class="text" id="explText"></div>
+        </div>
+        <div class="strategy-section" id="stratSection">
+            <div class="strategy-title">🧠 Other ways to think about it:</div>
+            <div id="stratCards"></div>
+        </div>
+        <div class="actions">
+            <button class="act-btn btn-hint" id="hintBtn" onclick="showHint()">💡 Hint</button>
+            <button class="act-btn btn-check" id="checkBtn" onclick="checkAnswer()">✅ Check</button>
+            <button class="act-btn btn-next" id="nextBtn" onclick="nextProblem()" style="display:none">➡️ Next</button>
+        </div>
+    </div>
+
+    <div class="confetti-box" id="confettiBox"></div>
+
+    <script>
+        const PROBLEMS = {
+            counting: [
+                {
+                    text: "On a farm there are 5 sheep, 3 cows, and 4 chickens. How many animals are there in total?", visual: "🐑🐑🐑🐑🐑 🐄🐄🐄 🐔🐔🐔🐔", choices: ["10", "11", "12", "13"], answer: 2,
+                    hints: ["Count each type of animal separately, then add them all up.", "5 sheep + 3 cows = 8. Now add the 4 chickens.", "5 + 3 + 4 = 12"],
+                    explanation: "Count each group: 5 sheep + 3 cows + 4 chickens. First 5 + 3 = 8, then 8 + 4 = 12.",
+                    strategies: [{ name: "🔢 Count All", detail: "Point to each animal one by one: 1, 2, 3... all the way to 12." }, { name: "➕ Add Groups", detail: "Group by type: 5 + 3 = 8, then 8 + 4 = 12." }, { name: "🔟 Make a Ten", detail: "5 + 3 = 8, then 8 + 2 = 10, plus 2 more = 12." }]
+                },
+                {
+                    text: "There are 8 birds on a tree. 3 more fly in. Then 2 fly away. How many birds are on the tree now?", visual: "🌳🐦", choices: ["7", "8", "9", "10"], answer: 2,
+                    hints: ["Start with 8 birds. What happens when 3 more come?", "8 + 3 = 11 birds. Now 2 fly away.", "11 - 2 = 9"],
+                    explanation: "Start with 8. Add 3 that fly in: 8 + 3 = 11. Subtract 2 that fly away: 11 - 2 = 9.",
+                    strategies: [{ name: "📏 Number Line", detail: "Start at 8, hop right 3 to reach 11, then hop left 2 to land on 9." }, { name: "📖 Act It Out", detail: "Hold up 8 fingers — add 3 more = 11. Put down 2 = 9." }]
+                },
+                {
+                    text: "Each table fits 4 children. There are 3 tables in the room. How many children can sit down?", visual: "🪑🪑🪑🪑  🪑🪑🪑🪑  🪑🪑🪑🪑", choices: ["7", "10", "12", "14"], answer: 2,
+                    hints: ["Each table has 4 seats. How many tables are there?", "Count by fours: 4, 8, 12...", "3 groups of 4 = 4 + 4 + 4 = 12"],
+                    explanation: "3 tables with 4 children each = 4 + 4 + 4 = 12 children.",
+                    strategies: [{ name: "🔢 Skip Count", detail: "Count by 4s: 4, 8, 12." }, { name: "➕ Repeated Addition", detail: "4 + 4 = 8, then 8 + 4 = 12." }]
+                },
+                {
+                    text: "Sam has 6 red marbles and 5 blue marbles. He gives 3 marbles to his friend. How many marbles does Sam have now?", visual: "🔴🔴🔴🔴🔴🔴 🔵🔵🔵🔵🔵", choices: ["6", "7", "8", "9"], answer: 2,
+                    hints: ["First, how many marbles does Sam have in total?", "6 + 5 = 11 marbles. Now he gives away 3.", "11 - 3 = 8"],
+                    explanation: "Total marbles: 6 + 5 = 11. After giving 3 away: 11 - 3 = 8.",
+                    strategies: [{ name: "🔟 Make a Ten", detail: "6 + 5: take 4 from 5 to make 10, plus 1 = 11. Then 11 - 3 = 8." }, { name: "🔄 Two Steps", detail: "Step 1: 6 + 5 = 11. Step 2: 11 - 3 = 8." }]
+                },
+                {
+                    text: "On a farm, there are 5 sheep, 5 hens, 2 dogs, 2 cats, and the farmer. How many legs are there altogether?", visual: "🐑🐑🐑🐑🐑 🐓🐓🐓🐓🐓 🐕🐕 🐱🐱 🧑‍🌾", choices: ["44", "46", "48", "50"], answer: 2,
+                    hints: ["Think about how many legs each type has. Sheep, dogs, and cats have 4 legs. Hens have 2. The farmer has 2.", "Sheep: 5x4=20, Hens: 5x2=10, Dogs: 2x4=8, Cats: 2x4=8, Farmer: 2", "20 + 10 + 8 + 8 + 2 = 48"],
+                    explanation: "Sheep: 5 x 4 = 20. Hens: 5 x 2 = 10. Dogs: 2 x 4 = 8. Cats: 2 x 4 = 8. Farmer: 2. Total: 20+10+8+8+2 = 48.",
+                    strategies: [{ name: "📋 Make a List", detail: "4-leg animals: 5+2+2=9, times 4 = 36. 2-leg: 5 hens + 1 farmer = 6, times 2 = 12. Total: 36+12 = 48." }, { name: "➕ Add Groups", detail: "20+10=30, 8+8=16, 30+16=46, 46+2=48." }]
+                }
+            ],
+            compare: [
+                {
+                    text: "Maya has 14 stickers. Kai has 8 stickers. How many more stickers does Maya have than Kai?", visual: "Maya: ⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐⭐\nKai:  ⭐⭐⭐⭐⭐⭐⭐⭐", choices: ["4", "5", "6", "7"], answer: 2,
+                    hints: ["To find 'how many more,' we subtract the smaller from the bigger.", "14 - 8 = ?. Try counting up from 8 to 14.", "8, 9, 10, 11, 12, 13, 14 = 6 hops"],
+                    explanation: "14 - 8 = 6. Maya has 6 more stickers than Kai.",
+                    strategies: [{ name: "📏 Count Up", detail: "Start at 8 and count up to 14: 9, 10, 11, 12, 13, 14. That is 6 counts!" }, { name: "🔟 Through Ten", detail: "8 + 2 = 10, 10 + 4 = 14. So 2 + 4 = 6." }]
+                },
+                {
+                    text: "Helen said to Mary: 'If you give me 4 apples, I will have exactly as many as you.' How many more apples does Mary have than Helen?", visual: "🍎🍎🍎🍎", choices: ["2", "4", "6", "8"], answer: 3,
+                    hints: ["If Mary gives 4 to Helen, they are equal. Mary loses 4, Helen gains 4.", "The difference shifts by 4 in each direction.", "Mary has 4 more going to Helen + Helen needs 4 to catch up = 8."],
+                    explanation: "When Mary gives 4 apples, she loses 4 and Helen gains 4. For them to be equal, the original difference must be 4 + 4 = 8.",
+                    strategies: [{ name: "🎭 Act It Out", detail: "Try numbers! If Mary has 14, Helen has 6. Give 4: Mary=10, Helen=10. Difference was 14-6=8." }, { name: "🔄 Think About It", detail: "Giving 4 apples closes the gap by 4 on BOTH sides. So gap = 4 x 2 = 8." }]
+                },
+                {
+                    text: "A book costs $15. A toy costs $9. How much more does the book cost than the toy?", visual: "📚 $15    🧸 $9", choices: ["4", "5", "6", "7"], answer: 2,
+                    hints: ["Find the difference between the two prices.", "15 - 9 = ? Try going through 10.", "15 - 5 = 10, 10 - 4 = 6. Or: 9 + 6 = 15."],
+                    explanation: "15 - 9 = 6. The book costs $6 more. You can check: $9 + $6 = $15.",
+                    strategies: [{ name: "🔟 Through Ten", detail: "15 - 9: First 15 - 5 = 10, then 10 - 4 = 6." }, { name: "🔄 Use Addition", detail: "Think: 9 + ? = 15. Count up 6!" }]
+                },
+                {
+                    text: "Tom is 7 years old. His sister is 12 years old. How old will Tom be when his sister is 15?", visual: "👦 7    👧 12", choices: ["8", "9", "10", "11"], answer: 2,
+                    hints: ["How many years until his sister is 15?", "12 to 15 = 3 more years. Tom ages the same amount.", "Tom is 7 now + 3 years = 10."],
+                    explanation: "Sister needs 15 - 12 = 3 more years. Tom will also age 3 years: 7 + 3 = 10.",
+                    strategies: [{ name: "🔄 Same Difference", detail: "They always stay 5 years apart! 15 - 5 = 10." }, { name: "⏩ Time Forward", detail: "In 3 years: Tom 7 becomes 10, Sister 12 becomes 15." }]
+                }
+            ],
+            missing: [
+                {
+                    text: "Some birds were sitting on a fence. 5 more came. Now there are 13 birds. How many were sitting on the fence at first?", visual: "🐦? + 🐦🐦🐦🐦🐦 = 13", choices: ["6", "7", "8", "9"], answer: 2,
+                    hints: ["We need to find what number plus 5 equals 13.", "? + 5 = 13 is the same as 13 - 5 = ?", "13 - 5 = 8. Check: 8 + 5 = 13"],
+                    explanation: "? + 5 = 13. Use subtraction to undo the addition: 13 - 5 = 8. Check: 8 + 5 = 13.",
+                    strategies: [{ name: "🔄 Addition and Subtraction", detail: "Addition and subtraction are opposites! If ? + 5 = 13, then ? = 13 - 5." }, { name: "📏 Count Back", detail: "Start at 13, count back 5: 12, 11, 10, 9, 8." }]
+                },
+                {
+                    text: "I think of a number. I add 7 to it and get 15. What was my number?", visual: "? + 7 = 15", choices: ["7", "8", "9", "10"], answer: 1,
+                    hints: ["If adding 7 gives 15, work backwards by subtracting.", "15 - 7 = ?", "15 - 7 = 8. Check: 8 + 7 = 15"],
+                    explanation: "Work backwards: 15 - 7 = 8. The number was 8.",
+                    strategies: [{ name: "🔙 Work Backwards", detail: "Undo the operation: 15 - 7 = 8." }, { name: "🔟 Through Ten", detail: "15 - 5 = 10, 10 - 2 = 8." }]
+                },
+                {
+                    text: "Sam had some stickers. He gave 6 to his friend. Now he has 9. How many did he start with?", visual: "? gives 6 away, 9 left", choices: ["13", "14", "15", "16"], answer: 2,
+                    hints: ["He ended with 9 after giving away 6. What did he start with?", "To undo giving away, we add back: 9 + 6 = ?", "9 + 6 = 15. Check: 15 - 6 = 9"],
+                    explanation: "He has 9 left after giving 6 away. Undo: 9 + 6 = 15. He started with 15.",
+                    strategies: [{ name: "🔄 Inverse Operations", detail: "Giving away = subtraction. Undo it with addition: 9 + 6 = 15." }, { name: "📏 Number Line", detail: "Start at 9, jump forward 6: land on 15." }]
+                },
+                {
+                    text: "What number goes in the box? 8 + ? = 14", visual: "8 + ? = 14", choices: ["4", "5", "6", "7"], answer: 2,
+                    hints: ["Count from 8 up to 14. How many steps?", "8, 9, 10, 11, 12, 13, 14", "That is 6 steps! 8 + 6 = 14"],
+                    explanation: "Count from 8 to 14: that is 6. Or use subtraction: 14 - 8 = 6.",
+                    strategies: [{ name: "🔄 Subtraction Helps", detail: "14 - 8 = 6. Addition and subtraction are related!" }, { name: "🔟 Through Ten", detail: "8 + 2 = 10, 10 + 4 = 14. So 2 + 4 = 6." }]
+                },
+                {
+                    text: "12 birds are on a tree. Some fly away. Now there are 5. How many flew away?", visual: "🌳 12 birds, some fly, 5 left", choices: ["5", "6", "7", "8"], answer: 2,
+                    hints: ["12 - ? = 5. How many did we take away?", "Count up from 5 to 12.", "5 to 12 is 7 steps. So 7 birds flew away."],
+                    explanation: "12 - ? = 5. Think: 5 + ? = 12. Count from 5 to 12: 7. So 7 birds flew away.",
+                    strategies: [{ name: "🔄 Think Addition", detail: "Instead of 12 - ? = 5, think 5 + ? = 12. It is easier!" }, { name: "📏 Count Up", detail: "5, 6, 7, 8, 9, 10, 11, 12 — that is 7 counts." }]
+                }
+            ],
+            pattern: [
+                {
+                    text: "What comes next in the pattern? 2, 5, 8, 11, ___", visual: "2 → 5 → 8 → 11 → ?", choices: ["12", "13", "14", "15"], answer: 2,
+                    hints: ["Look at how much each number grows by.", "2 to 5 is +3, 5 to 8 is +3, 8 to 11 is +3.", "The pattern adds 3 each time. 11 + 3 = 14."],
+                    explanation: "Each number is 3 more than the one before. 11 + 3 = 14.",
+                    strategies: [{ name: "🔢 Find the Rule", detail: "Look at the gaps: 5-2=3, 8-5=3, 11-8=3. Rule is +3." }, { name: "📏 Number Line", detail: "Each jump is 3: 2, 5, 8, 11, 14." }]
+                },
+                {
+                    text: "A frog jumps on rocks numbered 1 to 9. It starts on rock 2 and jumps every other rock. What is the last rock it lands on?", visual: "🐸 2 → 4 → 6 → ?", choices: ["7", "8", "9", "10"], answer: 1,
+                    hints: ["The frog starts at 2 and skips one rock each time.", "2, 4, 6, ... what comes next?", "2, 4, 6, 8. The frog cannot go to 10 (only rocks up to 9)."],
+                    explanation: "The frog visits: 2, 4, 6, 8. Rock 10 does not exist, so 8 is the last.",
+                    strategies: [{ name: "🔢 Skip Count", detail: "Count by 2s starting from 2: 2, 4, 6, 8." }, { name: "🎨 Draw It", detail: "Draw rocks 1 to 9. Circle every other one starting from 2." }]
+                },
+                {
+                    text: "After 1 comes 3, after 3 comes 5, after 5 comes 7. What comes after 7?", visual: "1 → 3 → 5 → 7 → ?", choices: ["8", "9", "10", "11"], answer: 1,
+                    hints: ["How much are we adding each time?", "1 to 3 = +2, 3 to 5 = +2, 5 to 7 = +2", "7 + 2 = 9"],
+                    explanation: "We add 2 each time: 1, 3, 5, 7, 9. These are the odd numbers!",
+                    strategies: [{ name: "🔢 Odd Numbers", detail: "These are all odd numbers! 1, 3, 5, 7, 9, 11..." }, { name: "➕ The Rule", detail: "The rule is +2 each time." }]
+                },
+                {
+                    text: "Look at this pattern: 20, 17, 14, 11, ___. What comes next?", visual: "20 → 17 → 14 → 11 → ?", choices: ["7", "8", "9", "10"], answer: 1,
+                    hints: ["The numbers are getting smaller. By how much?", "20 to 17 = -3, 17 to 14 = -3, 14 to 11 = -3", "11 - 3 = 8"],
+                    explanation: "Each number goes down by 3. 11 - 3 = 8.",
+                    strategies: [{ name: "🔢 Decreasing Pattern", detail: "Subtracting 3 each time: 20, 17, 14, 11, 8." }, { name: "🔄 Reverse Check", detail: "Going backwards: 8+3=11, 11+3=14. Correct!" }]
+                }
+            ],
+            word: [
+                {
+                    text: "Adam paid $6 for 15 buns. Tom bought 5 more of the same kind. How much did Tom pay?", visual: "🥐 15 buns = $6, 20 buns = ?", choices: ["$7", "$8", "$9", "$10"], answer: 1,
+                    hints: ["Tom bought 15 + 5 = 20 buns. If 15 buns cost $6, what do 5 buns cost?", "15 buns = $6, so 5 buns = $2 (since 15 / 3 = 5).", "Tom: $6 + $2 = $8"],
+                    explanation: "5 buns is 1/3 of 15 buns, so 5 buns cost $6 / 3 = $2. Tom bought 20 buns: $6 + $2 = $8.",
+                    strategies: [{ name: "📦 Unit Thinking", detail: "Find the cost of 5 buns first. 15 / 3 = 5, so $6 / 3 = $2 per 5 buns." }, { name: "➕ Add On", detail: "Tom got 5 more than Adam. 5 extra buns cost $2. $6 + $2 = $8." }]
+                },
+                {
+                    text: "Maya has 6 red blocks and some blue blocks. She has 14 blocks in total. How many blue blocks does she have?", visual: "🟥🟥🟥🟥🟥🟥 🟦🟦🟦🟦🟦🟦🟦🟦", choices: ["6", "7", "8", "9"], answer: 2,
+                    hints: ["Total blocks - Red blocks = Blue blocks", "14 - 6 = ?", "14 - 6 = 8 blue blocks"],
+                    explanation: "14 total - 6 red = 8 blue blocks. Check: 6 + 8 = 14.",
+                    strategies: [{ name: "🧩 Part-Whole", detail: "The whole is 14. One part is 6. Missing part = 14 - 6 = 8." }, { name: "📏 Count Up", detail: "Start at 6, count to 14: that is 8 more." }]
+                },
+                {
+                    text: "Lucy walks to school in 10 minutes. She left home at 12:30. Her friend Maria lives halfway. What time did Lucy pass Maria's house?", visual: "🏠 12:30 → 🏠 halfway → 🏫", choices: ["12:33", "12:35", "12:37", "12:40"], answer: 1,
+                    hints: ["Halfway means half the time has passed.", "Half of 10 minutes = 5 minutes.", "12:30 + 5 minutes = 12:35"],
+                    explanation: "Halfway through a 10-minute walk = 5 minutes. 12:30 + 5 = 12:35.",
+                    strategies: [{ name: "➗ Half", detail: "Half of 10 = 5. She passes Maria's house after 5 minutes." }, { name: "📏 Timeline", detail: "12:30 then 12:35 (halfway) then 12:40 (school)" }]
+                },
+                {
+                    text: "In two days, a tourist walked 18 km. On the second day, he walked 4 km more than the first day. How many km did he walk on the first day?", visual: "Day 1: ? km    Day 2: ?+4 km    Total: 18 km", choices: ["5", "6", "7", "8"], answer: 2,
+                    hints: ["If both days were equal, the total would be 18. But day 2 was 4 more.", "Without the extra 4 km: 18 - 4 = 14. Split equally: 14 / 2 = 7.", "Day 1: 7 km, Day 2: 7 + 4 = 11 km. Check: 7 + 11 = 18"],
+                    explanation: "Remove the extra 4: 18 - 4 = 14. Split equally: 14 / 2 = 7 km on day 1.",
+                    strategies: [{ name: "⚖️ Balance Method", detail: "Take away the extra to make both days equal, then split." }, { name: "🎭 Guess and Check", detail: "Try 7: day 2 = 11. 7+11 = 18. Correct!" }]
+                },
+                {
+                    text: "Last year, the sum of the ages of Iris, Bee, and Lydia was 18. What is the sum of their ages this year?", visual: "👧+👧+👧 = 18 last year, ? this year", choices: ["19", "20", "21", "22"], answer: 2,
+                    hints: ["Each person is one year older this year.", "There are 3 people, each one year older.", "18 + 3 = 21"],
+                    explanation: "Each of the 3 friends is 1 year older. So add 3: 18 + 3 = 21.",
+                    strategies: [{ name: "🧠 Logic", detail: "3 people times 1 extra year each = 3 more total." }, { name: "🎭 Try Numbers", detail: "If they were 5, 6, 7 (=18), now they are 6, 7, 8 (=21)." }]
+                },
+                {
+                    text: "14 children line up in pairs. How many pairs are there?", visual: "👫 👫 👫 👫 👫 👫 👫", choices: ["5", "6", "7", "8"], answer: 2,
+                    hints: ["A pair means 2 children standing together.", "How many groups of 2 are in 14?", "14 / 2 = 7 pairs"],
+                    explanation: "14 children / 2 per pair = 7 pairs.",
+                    strategies: [{ name: "🔢 Skip Count", detail: "Count by 2s up to 14: 2, 4, 6, 8, 10, 12, 14. That is 7 counts." }, { name: "➗ Sharing", detail: "Split 14 into groups of 2." }]
+                }
+            ]
+        };
+
+        let state = { cat: 'all', problems: [], idx: 0, score: 0, streak: 0, selected: -1, hintLevel: 0, answered: false };
+
+        function shuffle(a) { for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1));[a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+        function startGame(cat) {
+            state.cat = cat; state.score = 0; state.streak = 0; state.idx = 0;
+            if (cat === 'all') { state.problems = shuffle(Object.values(PROBLEMS).flat()).slice(0, 10); }
+            else { state.problems = shuffle([...PROBLEMS[cat]]).slice(0, 10); }
+            if (state.problems.length === 0) return;
+            document.getElementById('score').textContent = 0;
+            document.getElementById('total').textContent = state.problems.length;
+            document.getElementById('streak').textContent = 0;
+            showScreen('game'); loadProblem();
+        }
+
+        function loadProblem() {
+            var p = state.problems[state.idx];
+            state.selected = -1; state.hintLevel = 0; state.answered = false;
+            document.getElementById('probNum').textContent = 'Question ' + (state.idx + 1) + ' of ' + state.problems.length;
+            document.getElementById('progressFill').style.width = (state.idx / state.problems.length * 100) + '%';
+            var catMap = { counting: ['🐾 Counting', 'var(--green-bg)', '#15803d'], compare: ['⚖️ Compare', 'var(--blue-bg)', '#1d4ed8'], missing: ['❓ Missing', 'var(--purple-bg)', '#6d28d9'], pattern: ['🔢 Pattern', 'var(--orange-bg)', '#92400e'], word: ['📖 Word Problem', '#fce7f3', '#be185d'] };
+            var catKey = 'word';
+            for (var k of Object.keys(PROBLEMS)) { if (PROBLEMS[k].includes(p)) { catKey = k; break; } }
+            var info = catMap[catKey] || catMap.word;
+            var catEl = document.getElementById('probCat');
+            catEl.textContent = info[0]; catEl.style.background = info[1]; catEl.style.color = info[2];
+            document.getElementById('probText').textContent = p.text;
+            document.getElementById('probVisual').textContent = p.visual || '';
+            var cDiv = document.getElementById('choices'); cDiv.innerHTML = '';
+            var letters = ['A', 'B', 'C', 'D', 'E'];
+            p.choices.forEach(function (c, i) {
+                var btn = document.createElement('button');
+                btn.className = 'choice-btn';
+                btn.innerHTML = '<span class="choice-letter">' + letters[i] + '</span> ' + c;
+                btn.onclick = function () { selectChoice(i); };
+                cDiv.appendChild(btn);
+            });
+            document.getElementById('hintBox').classList.remove('visible');
+            document.getElementById('explBox').classList.remove('visible');
+            document.getElementById('stratSection').classList.remove('visible');
+            document.getElementById('hintBtn').style.display = '';
+            document.getElementById('checkBtn').style.display = '';
+            document.getElementById('nextBtn').style.display = 'none';
+            speakProblem();
+        }
+
+        function selectChoice(i) {
+            if (state.answered) return;
+            state.selected = i;
+            document.querySelectorAll('.choice-btn').forEach(function (b, j) { b.classList.toggle('selected', j === i); });
+        }
+
+        function checkAnswer() {
+            if (state.selected === -1 || state.answered) { speak("Tap an answer first!"); return; }
+            var p = state.problems[state.idx]; state.answered = true;
+            if (state.selected === p.answer) {
+                document.querySelectorAll('.choice-btn')[state.selected].classList.add('correct');
+                state.score++; state.streak++;
+                document.getElementById('score').textContent = state.score;
+                document.getElementById('streak').textContent = state.streak;
+                showConfetti(); speak(getPositive());
+            } else {
+                document.querySelectorAll('.choice-btn')[state.selected].classList.add('wrong');
+                document.querySelectorAll('.choice-btn')[p.answer].classList.add('correct');
+                state.streak = 0; document.getElementById('streak').textContent = 0;
+                speak("Not quite! Let me show you how to solve it.");
+            }
+            showExplanation(p); showStrategies(p);
+            document.getElementById('hintBtn').style.display = 'none';
+            document.getElementById('checkBtn').style.display = 'none';
+            document.getElementById('nextBtn').style.display = '';
+        }
+
+        function showHint() {
+            if (state.answered) return;
+            var p = state.problems[state.idx];
+            if (state.hintLevel >= p.hints.length) return;
+            var hint = p.hints[state.hintLevel];
+            var box = document.getElementById('hintBox'); box.classList.add('visible');
+            var concepts = ['🔢 Number Line', '🔄 Inverse Operations', '🔟 Make a Ten', '🎨 Draw It', '🔙 Work Backwards', '📦 Part-Whole', '⚖️ Balance'];
+            var concept = concepts[state.hintLevel % concepts.length];
+            document.getElementById('hintLabel').textContent = '💡 Hint ' + (state.hintLevel + 1) + ' of ' + p.hints.length;
+            document.getElementById('hintText').innerHTML = hint + '<br><span class="hint-concept">' + concept + '</span>';
+            speak(hint); state.hintLevel++;
+        }
+
+        function showExplanation(p) {
+            var box = document.getElementById('explBox'); box.classList.add('visible');
+            document.getElementById('explText').textContent = p.explanation;
+        }
+
+        function showStrategies(p) {
+            if (!p.strategies) return;
+            var section = document.getElementById('stratSection');
+            var cards = document.getElementById('stratCards');
+            section.classList.add('visible'); cards.innerHTML = '';
+            p.strategies.forEach(function (s) {
+                var card = document.createElement('div'); card.className = 'strategy-card';
+                card.innerHTML = '<div class="name">' + s.name + '</div><div class="detail">' + s.detail + '</div>';
+                card.onclick = function () {
+                    var wasOpen = card.classList.contains('open');
+                    document.querySelectorAll('.strategy-card').forEach(function (c) { c.classList.remove('open'); });
+                    if (!wasOpen) { card.classList.add('open'); speak(s.detail); }
+                };
+                cards.appendChild(card);
+            });
+        }
+
+        function nextProblem() {
+            state.idx++;
+            if (state.idx >= state.problems.length) {
+                speak('Great job! You got ' + state.score + ' out of ' + state.problems.length + '!');
+                alert('🏆 You scored ' + state.score + ' out of ' + state.problems.length + '! Amazing work!');
+                goHome(); return;
+            }
+            loadProblem();
+        }
+
+        function speak(text) {
+            if (!('speechSynthesis' in window)) return;
+            speechSynthesis.cancel();
+            var u = new SpeechSynthesisUtterance(text); u.rate = 0.85; u.pitch = 1.1;
+            var voices = speechSynthesis.getVoices();
+            var pref = voices.find(function (v) { return v.name.indexOf('Samantha') >= 0 || v.name.indexOf('Karen') >= 0; });
+            if (pref) u.voice = pref;
+            speechSynthesis.speak(u);
+        }
+        if ('speechSynthesis' in window) { speechSynthesis.getVoices(); speechSynthesis.onvoiceschanged = function () { speechSynthesis.getVoices(); }; }
+
+        function speakProblem() { var p = state.problems[state.idx]; if (p) speak(p.text); }
+
+        function getPositive() {
+            var msgs = ["Amazing! 🌟", "You got it! 🎉", "Fantastic! ⭐", "Brilliant! 🧠", "Way to go! 🚀", "Math star! 💫"];
+            return msgs[Math.floor(Math.random() * msgs.length)];
+        }
+
+        function showConfetti() {
+            var box = document.getElementById('confettiBox');
+            var colors = ['#22c55e', '#3b82f6', '#8b5cf6', '#f59e0b', '#ec4899', '#ef4444'];
+            for (var i = 0; i < 30; i++) {
+                var p = document.createElement('div'); p.className = 'confetti';
+                p.style.left = Math.random() * 100 + '%';
+                p.style.background = colors[Math.floor(Math.random() * colors.length)];
+                p.style.animationDelay = Math.random() * 0.5 + 's';
+                box.appendChild(p);
+            }
+            setTimeout(function () { box.innerHTML = ''; }, 3000);
+        }
+
+        function showScreen(id) { document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); }); document.getElementById(id).classList.add('active'); }
+        function goHome() { if ('speechSynthesis' in window) speechSynthesis.cancel(); showScreen('welcome'); }
+    </script>
+</body>
+
+</html>
